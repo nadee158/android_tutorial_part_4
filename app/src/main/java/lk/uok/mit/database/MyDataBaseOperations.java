@@ -58,37 +58,51 @@ public class MyDataBaseOperations {
         return message;
     }
 
-    private static final String[] allColumns = {
+    private static final String[] ALL_COLUMNS_OF_TABLE_MESSAGE = {
             MyDatabaseHelper.COLUMN_ID,
             MyDatabaseHelper.COLUMN_CONTACT_NUMBER,
             MyDatabaseHelper.COLUMN_MESSAGE_TEXT,
             MyDatabaseHelper.COLUMN_SENT_TIME,
             MyDatabaseHelper.COLUMN_SENT_STATUS,
             MyDatabaseHelper.COLUMN_RETRY_COUNT
-
     };
 
+
     public List<Message> getAllMessages() {
-
-        Cursor cursor = database.query(MyDatabaseHelper.TABLE_MESSAGE, allColumns, null, null, null, null, null);
-
+        //open the database as read only - not updating anything now
+        this.openDatabase(true);
+        //execute the query for given parameters and get the resulting Cursor object, which is positioned before the first entry.
+        Cursor cursor = database.query(MyDatabaseHelper.TABLE_MESSAGE, ALL_COLUMNS_OF_TABLE_MESSAGE,
+                null, null, null, null, null);
+        //initalize an empty ArrayList of type "Message" to contain the created java objects from result set
         List<Message> messages = new ArrayList<Message>();
+        //checkif there are any resulting records, count should be greater than 0
         if (cursor.getCount() > 0) {
+            //next iterate over the resulting rows, and create a Message object for each row
             while (cursor.moveToNext()) {
+                //create a Message object for each row
                 Message message = new Message();
+                //set properties of Message object by retrieving the values from relavent column
                 message.setId(cursor.getInt(cursor.getColumnIndex(MyDatabaseHelper.COLUMN_ID)));
                 message.setContactNumber(cursor.getString(cursor.getColumnIndex(MyDatabaseHelper.COLUMN_CONTACT_NUMBER)));
                 message.setMessageText(cursor.getString(cursor.getColumnIndex(MyDatabaseHelper.COLUMN_MESSAGE_TEXT)));
+                //recall, we set the "sent_time", as a string, now we have to retrieve it as a string
+                // and parse it to a "java.util.Date" by using the same "java.text.SimpleDateFormat" object - same date pattern
+                //the Date parsing operation can throw a "java.text.ParseException", handle it in a try-catch block
                 try {
                     message.setSentTime(simpleDateFormat.parse(cursor.getString(cursor.getColumnIndex(MyDatabaseHelper.COLUMN_SENT_TIME))));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+                //even though we set the boolean value to "sent_status" column, SQLite database stores it as an int
+                // value 1-true, value 0- false ; based on that we have set the sent_status
                 message.setSentStatus(cursor.getInt(cursor.getColumnIndex(MyDatabaseHelper.COLUMN_SENT_STATUS)) > 0);
                 message.setRetryCount(cursor.getShort(cursor.getColumnIndex(MyDatabaseHelper.COLUMN_RETRY_COUNT)));
+                //after assigning all the properties, add the created message object to the list we initialized
                 messages.add(message);
             }
         }
+        this.closeDatabase();
         // return All Messages
         return messages;
     }

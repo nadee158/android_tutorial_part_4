@@ -23,10 +23,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import lk.uok.mit.database.MyDataBaseOperations;
 import lk.uok.mit.helloworld.HelloWorldActivity;
 import lk.uok.mit.helloworld.R;
+import lk.uok.mit.model.Message;
 
 public class SendMessageActivity extends Activity {
 
@@ -43,6 +46,8 @@ public class SendMessageActivity extends Activity {
 
     private String[] requiredPermissions = {Manifest.permission.READ_CONTACTS, Manifest.permission.SEND_SMS};
 
+    private MyDataBaseOperations dataBaseOperations;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +57,8 @@ public class SendMessageActivity extends Activity {
         this.context = getApplicationContext();
         //initialize the autoCompleteTextContactNumber by geting reference
         this.autoCompleteTextContactNumber = findViewById(R.id.autoCompleteTextContactNumber);
+
+        this.dataBaseOperations = new MyDataBaseOperations(context);
 
         //get if permission is granted or not to read contacts
         boolean hasPermission = this.hasUserPermissions(requiredPermissions);
@@ -107,7 +114,8 @@ public class SendMessageActivity extends Activity {
                     requestPermissions(requiredPermissions);
                 } else {
                     //call the setDataSourceForAutoComplete method we wrote to initialize the data source
-                    sendSMS(contactNumberText, messageText);
+                    boolean sentStatus = sendSMS(contactNumberText, messageText);
+                    saveMessage(contactNumberText, messageText, sentStatus);
                 }
 
                 //create a new Intent by passing the context of the current Activity
@@ -122,7 +130,18 @@ public class SendMessageActivity extends Activity {
         });
     }
 
-    private void sendSMS(String contactNumber, String message) {
+    private void saveMessage(String contactNumber, String messageText, boolean sentStatus) {
+        Message message = new Message();
+        message.setContactNumber(contactNumber);
+        message.setMessageText(messageText);
+        message.setSentStatus(sentStatus);
+        message.setRetryCount((short) 1);
+        message.setSentTime(Calendar.getInstance().getTime());
+        this.dataBaseOperations.createMessage(message);
+    }
+
+    private boolean sendSMS(String contactNumber, String message) {
+        boolean sentStatus = true;
         //include the code snippet in a try-catch block as this operation is likely to throw errors
         try {
             //i.	Get a reference to “android.telephony.SmsManager” class
@@ -132,11 +151,14 @@ public class SendMessageActivity extends Activity {
             //if code reached here, it means no exceptions occurred, notify the user of success
             Toast.makeText(this.context, "SMS Sent!", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
+            //if an exception occurs, set the sent status as false
+            sentStatus = false;
             //if code reached here, it means an exception has occurred, notify the user of failure
             Toast.makeText(this.context, "SMS faild, please try again later!", Toast.LENGTH_LONG).show();
             //print the error trace to fins the cause
             e.printStackTrace();
         }
+        return sentStatus;
     }
 
     //a method to set the data source (adapter) to the autoCompleteTextContactNumber
