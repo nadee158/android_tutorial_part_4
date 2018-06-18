@@ -1,4 +1,4 @@
-package lk.uom.mit.adapter;
+package lk.uok.mit.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -29,13 +29,13 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
     //add a constructor to accept context and data set
     public MessageAdapter(@NonNull Context context, List<Message> messages) {
-        //call super clase's constructor by passing the context and the data set
-        super(context, R.layout.message_row_item);
+        //call super clase's constructor by passing the context, layout and the data set
+        super(context, R.layout.message_row_item, messages);
         this.context = context;
         this.messages = messages;
     }
 
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy hh:mm:ss");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy hh:mm a");
 
     @NonNull
     @Override
@@ -52,18 +52,10 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         }
 
         //using the inflated (initialized) convertView, get its child text views by id, if they are null
-        if (this.rowItemContactNumber == null) {
-            this.rowItemContactNumber = convertView.findViewById(R.id.textViewMessageRowItemContactNumber);
-        }
-        if (this.rowItemMessageText == null) {
-            this.rowItemMessageText = convertView.findViewById(R.id.textViewMessageRowItemMessageText);
-        }
-        if (this.rowItemSentStatus == null) {
-            this.rowItemSentStatus = convertView.findViewById(R.id.textViewMessageRowItemSentStatus);
-        }
-        if (this.rowItemSentTime == null) {
-            this.rowItemSentTime = convertView.findViewById(R.id.textViewMessageRowItemSentTime);
-        }
+        this.rowItemContactNumber = convertView.findViewById(R.id.textViewMessageRowItemContactNumber);
+        this.rowItemMessageText = convertView.findViewById(R.id.textViewMessageRowItemMessageText);
+        this.rowItemSentStatus = convertView.findViewById(R.id.textViewMessageRowItemSentStatus);
+        this.rowItemSentTime = convertView.findViewById(R.id.textViewMessageRowItemSentTime);
 
         //now set the data to be displyed in each text view
         this.rowItemContactNumber.setText(currentMessage.getContactNumber());

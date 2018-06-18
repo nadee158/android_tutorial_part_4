@@ -35,7 +35,7 @@ public class MyDataBaseOperations {
     }
 
     //to format the "sent_time" to a string
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS.SSS");
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss");
 
     //the method to insert a record to "message" table
     public Message createMessage(Message message) {

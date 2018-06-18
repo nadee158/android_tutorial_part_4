@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -145,9 +144,9 @@ public class SendMessageActivity extends Activity {
         //include the code snippet in a try-catch block as this operation is likely to throw errors
         try {
             //i.	Get a reference to “android.telephony.SmsManager” class
-            SmsManager smsManager = SmsManager.getDefault();
-            //use the sendTextMessage method to send the SMS and pass the contact number and message as parameters
-            smsManager.sendTextMessage(contactNumber, null, message, null, null);
+//            SmsManager smsManager = SmsManager.getDefault();
+//            //use the sendTextMessage method to send the SMS and pass the contact number and message as parameters
+//            smsManager.sendTextMessage(contactNumber, null, message, null, null);
             //if code reached here, it means no exceptions occurred, notify the user of success
             Toast.makeText(this.context, "SMS Sent!", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
